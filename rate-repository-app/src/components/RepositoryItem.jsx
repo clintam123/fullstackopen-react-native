@@ -17,11 +17,12 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     padding: 10,
   },
-  flexItemB: {
+  flexItem: {
     paddingTop: 3,
     flexGrow: 0,
     borderColor: "black",
     alignItems: "flex-start",
+    flexShrink: 1,
   },
   repoStats: {
     paddingLeft: 25,
