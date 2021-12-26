@@ -7,9 +7,10 @@ import AppBarTab from "./AppBarTab";
 
 const styles = StyleSheet.create({
   flexContainer: {
-    paddingTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight * 2,
     backgroundColor: theme.colors.appBar,
     display: "flex",
+    paddingBottom: Constants.statusBarHeight,
   },
 });
 

@@ -6,6 +6,7 @@ import Text from "./Text";
 const styles = StyleSheet.create({
   flexItem: {
     color: "white",
+    paddingLeft: 10,
   },
 });
 
