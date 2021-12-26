@@ -17,7 +17,7 @@ const RepositoryItem = ({ item }) => {
   return (
     <>
       {Object.values(item).map((e, index) => (
-        <Text>
+        <Text key={index}>
           {properties[index]}: {e}
         </Text>
       ))}
