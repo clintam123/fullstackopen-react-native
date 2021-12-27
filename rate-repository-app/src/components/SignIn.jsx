@@ -1,35 +1,30 @@
 import React from "react";
 import { Formik } from "formik";
-import { View, Button, StyleSheet } from "react-native";
+import * as yup from "yup";
 
-import FormikTextInput from "./FormikTextInput";
+import SignInForm from "./SignInForm";
 
-const SignInForm = ({ onSubmit }) => {
-  return (
-    <View>
-      <FormikTextInput name="username" placeholder="Username" />
-      <FormikTextInput
-        name="password"
-        placeholder="Password"
-        secureTextExtry={true}
-      />
-      <Button onPress={onSubmit} title="Sign In" />
-    </View>
-  );
+const initialValues = {
+  username: "",
+  password: "",
 };
 
+const onSubmit = (values) => {
+  console.log(values);
+};
+
+const validationSchema = yup.object({
+  username: yup.string().required("Username is required"),
+  password: yup.string().required("Password is required"),
+});
+
 const SignIn = () => {
-  const initialValues = {
-    username: "",
-    password: "",
-  };
-
-  const onSubmit = (values) => {
-    console.log(values);
-  };
-
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validationSchema={validationSchema}
+    >
       {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
     </Formik>
   );
