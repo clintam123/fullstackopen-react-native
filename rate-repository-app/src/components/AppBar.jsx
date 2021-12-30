@@ -6,6 +6,11 @@ import { Link } from "react-router-native";
 import theme from "../theme";
 import Text from "./Text";
 
+import { AUTHORIZED_USER } from "../graphql/queries";
+import AuthStorageContext from "../contexts/AuthStorageContext";
+import useAuthStorage from "../hooks/useAuthStorage";
+import { useApolloClient, useQuery } from "@apollo/client";
+
 const styles = StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight,
@@ -42,15 +47,36 @@ const AppBarTab = ({ children, ...props }) => {
 };
 
 const AppBar = () => {
+  const authStorage = useAuthStorage(AuthStorageContext);
+  const apolloClient = useApolloClient();
+
+  const { loading, data } = useQuery(AUTHORIZED_USER, {
+    fetchPolicy: "cache-and-network",
+  });
+
+  const handleLogOut = async () => {
+    await authStorage.removeAccessToken();
+    apolloClient.resetStore();
+  };
+
+  if (loading) return <Text>Loading...</Text>;
+  console.log(data);
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} horizontal>
         <Link to="/" component={AppBarTab}>
           Repositories
         </Link>
-        <Link to="/sign-in" component={AppBarTab}>
-          Sign in
-        </Link>
+        {!data.authorizedUser ? (
+          <Link to="/sign-in" component={AppBarTab}>
+            Sign in
+          </Link>
+        ) : (
+          <Link to="/" component={AppBarTab} onPress={handleLogOut}>
+            Sign out
+          </Link>
+        )}
       </ScrollView>
     </View>
   );
