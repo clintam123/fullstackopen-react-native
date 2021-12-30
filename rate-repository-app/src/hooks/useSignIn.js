@@ -1,27 +1,28 @@
-import { useMutation } from "@apollo/client";
-import { AUTHORIZE } from "../graphql/mutations";
+import { useApolloClient, useMutation } from "@apollo/client";
 
+import { AUTHORIZE } from "../graphql/mutations";
 import useAuthStorage from "../hooks/useAuthStorage";
-import { useApolloClient } from "@apollo/client";
-import AuthStorageContext from "../contexts/AuthStorageContext";
-import { useHistory } from "react-router-native";
-import { logCurrentStorage } from "../utils/authStorage";
 
 const useSignIn = () => {
-  const authStorage = useAuthStorage(AuthStorageContext);
-  const [mutate, { data }] = useMutation(AUTHORIZE);
+  const [mutate, result] = useMutation(AUTHORIZE);
   const apolloClient = useApolloClient();
-  let history = useHistory();
+  const authStorage = useAuthStorage();
 
   const signIn = async ({ username, password }) => {
-    const { data } = await mutate({ variables: { username, password } });
-    await authStorage.setAccessToken(data.authorize.accessToken);
-    logCurrentStorage();
-    apolloClient.clearStore();
-    history.push("/");
+    const credentials = { username, password };
+
+    const payload = await mutate({ variables: { credentials } });
+    const { data } = payload;
+
+    if (data && data.authorize) {
+      await authStorage.setAccessToken(data.authorize.accessToken);
+      apolloClient.resetStore();
+    }
+
+    return payload;
   };
 
-  return [signIn, data];
+  return [signIn, result];
 };
 
 export default useSignIn;

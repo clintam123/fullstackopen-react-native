@@ -1,18 +1,25 @@
 import { gql } from "@apollo/client";
 
-export const REPOSITORY_DETAILS = gql`
-  fragment RepositoryDetails on Repository {
+export const REPOSITORY_BASE_FIELDS = gql`
+  fragment repositoryBaseFields on Repository {
     id
     name
     ownerName
-    createdAt
     fullName
+    stargazersCount
+    forksCount
+    url
+    ownerAvatarUrl
     description
     language
-    forksCount
-    stargazersCount
-    ratingAverage
-    reviewCount
-    ownerAvatarUrl
+    createdAt
+  }
+`;
+
+export const USER_BASE_FIELDS = gql`
+  fragment userBaseFields on User {
+    id
+    username
+    createdAt
   }
 `;

@@ -1,15 +1,16 @@
 import React from "react";
+
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
+
 import Constants from "expo-constants";
 import { Link } from "react-router-native";
+import { useApolloClient, useQuery } from "@apollo/client";
+import { useHistory } from "react-router-native";
 
 import theme from "../theme";
 import Text from "./Text";
-
-import { AUTHORIZED_USER } from "../graphql/queries";
-import AuthStorageContext from "../contexts/AuthStorageContext";
 import useAuthStorage from "../hooks/useAuthStorage";
-import { useApolloClient, useQuery } from "@apollo/client";
+import { GET_AUTHORIZED_USER } from "../graphql/queries";
 
 const styles = StyleSheet.create({
   container: {
@@ -47,20 +48,18 @@ const AppBarTab = ({ children, ...props }) => {
 };
 
 const AppBar = () => {
-  const authStorage = useAuthStorage(AuthStorageContext);
   const apolloClient = useApolloClient();
+  const authStorage = useAuthStorage();
+  const history = useHistory();
 
-  const { loading, data } = useQuery(AUTHORIZED_USER, {
-    fetchPolicy: "cache-and-network",
-  });
+  const { data } = useQuery(GET_AUTHORIZED_USER);
+  const authorizedUser = data ? data.authorizedUser : undefined;
 
-  const handleLogOut = async () => {
+  const onSignOut = async () => {
     await authStorage.removeAccessToken();
     apolloClient.resetStore();
+    history.push("/");
   };
-
-  if (loading) return <Text>Loading...</Text>;
-  console.log(data);
 
   return (
     <View style={styles.container}>
@@ -68,13 +67,11 @@ const AppBar = () => {
         <Link to="/" component={AppBarTab}>
           Repositories
         </Link>
-        {!data.authorizedUser ? (
+        {authorizedUser ? (
+          <AppBarTab onPress={onSignOut}>Sign out</AppBarTab>
+        ) : (
           <Link to="/sign-in" component={AppBarTab}>
             Sign in
-          </Link>
-        ) : (
-          <Link to="/" component={AppBarTab} onPress={handleLogOut}>
-            Sign out
           </Link>
         )}
       </ScrollView>

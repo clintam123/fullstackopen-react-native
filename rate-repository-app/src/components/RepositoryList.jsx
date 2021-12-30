@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { FlatList, View, StyleSheet } from "react-native";
 
 import RepositoryItem from "./RepositoryItem";
@@ -15,7 +15,6 @@ const ItemSeparator = () => <View style={styles.separator} />;
 const RepositoryList = () => {
   const { repositories } = useRepositories();
 
-  // Get the nodes from the edges array
   const repositoryNodes = repositories
     ? repositories.edges.map((edge) => edge.node)
     : [];
@@ -23,7 +22,7 @@ const RepositoryList = () => {
   return (
     <FlatList
       data={repositoryNodes}
-      keyExtractor={(item) => item.id}
+      keyExtractor={({ id }) => id}
       renderItem={({ item }) => <RepositoryItem repository={item} />}
       ItemSeparatorComponent={ItemSeparator}
     />
