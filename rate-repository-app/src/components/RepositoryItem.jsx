@@ -60,10 +60,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const CountItem = ({ label, count }) => {
+const CountItem = ({ label, count, id }) => {
   return (
     <View style={styles.countItem}>
-      <Text style={styles.countItemCount} fontWeight="bold">
+      <Text
+        style={styles.countItemCount}
+        fontWeight="bold"
+        testID={`${id}/${label}`}
+      >
         {formatInThousands(count)}
       </Text>
       <Text color="textSecondary">{label}</Text>
@@ -73,6 +77,7 @@ const CountItem = ({ label, count }) => {
 
 const RepositoryItem = ({ repository }) => {
   const {
+    id,
     fullName,
     description,
     language,
@@ -95,24 +100,31 @@ const RepositoryItem = ({ repository }) => {
             fontWeight="bold"
             fontSize="subheading"
             numberOfLines={1}
+            testID={`${id}/fullName`}
           >
             {fullName}
           </Text>
-          <Text style={styles.descriptionText} color="textSecondary">
+          <Text
+            style={styles.descriptionText}
+            color="textSecondary"
+            testID={`${id}/description`}
+          >
             {description}
           </Text>
           {language ? (
             <View style={styles.languageContainer}>
-              <Text style={styles.languageText}>{language}</Text>
+              <Text style={styles.languageText} testID={`${id}/lang`}>
+                {language}
+              </Text>
             </View>
           ) : null}
         </View>
       </View>
       <View style={styles.bottomContainer}>
-        <CountItem count={stargazersCount} label="Stars" />
-        <CountItem count={forksCount} label="Forks" />
-        <CountItem count={reviewCount} label="Reviews" />
-        <CountItem count={ratingAverage} label="Rating" />
+        <CountItem count={stargazersCount} label="Stars" id={id} />
+        <CountItem count={forksCount} label="Forks" id={id} />
+        <CountItem count={reviewCount} label="Reviews" id={id} />
+        <CountItem count={ratingAverage} label="Rating" id={id} />
       </View>
     </View>
   );

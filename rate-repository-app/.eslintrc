@@ -1,4 +1,8 @@
 {
+    "plugins": [
+        "react",
+        "jest"
+    ],
     "parser": "@babel/eslint-parser",
     "settings": {
         "react": {
@@ -11,9 +15,10 @@
     },
     "extends": [
         "plugin:react/recommended",
-        "standard",
         "plugin:react/jsx-runtime",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:jest/recommended",
+        "standard"
     ],
     "parserOptions": {
         "sourceType": "module"
