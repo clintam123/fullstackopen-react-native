@@ -1,9 +1,13 @@
-import React from "react";
-import { View, Image, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Image, StyleSheet, Button, Linking } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import { useLazyQuery } from "@apollo/client";
+import { useParams } from "react-router-native";
 
 import theme from "../theme";
 import Text from "./Text";
 import formatInThousands from "../utils/formatInThousands";
+import { GET_REPOSITORY } from "../graphql/queries";
 
 const styles = StyleSheet.create({
   container: {
@@ -75,7 +79,22 @@ const CountItem = ({ label, count, id }) => {
   );
 };
 
-const RepositoryItem = ({ repository }) => {
+const RepositoryItem = ({ repository = {}, singleView = false }) => {
+  const [repoData, setRepoData] = useState(repository);
+  const [getRepoData, { data, loading }] = useLazyQuery(GET_REPOSITORY);
+  const { id: idFromParams } = useParams();
+
+  useEffect(() => {
+    if (!Object.keys(repository).length) {
+      getRepoData({ variables: { id: idFromParams } });
+    }
+    if (data && data.repository) {
+      setRepoData(data.repository);
+    }
+  }, [data]);
+
+  if (loading) return <Text>...Loading</Text>;
+
   const {
     id,
     fullName,
@@ -86,7 +105,8 @@ const RepositoryItem = ({ repository }) => {
     ratingAverage,
     reviewCount,
     ownerAvatarUrl,
-  } = repository;
+    url,
+  } = repoData;
 
   return (
     <View style={styles.container}>
@@ -126,6 +146,14 @@ const RepositoryItem = ({ repository }) => {
         <CountItem count={reviewCount} label="Reviews" id={id} />
         <CountItem count={ratingAverage} label="Rating" id={id} />
       </View>
+      {singleView && (
+        <Button
+          onPress={() => {
+            Linking.openURL(url);
+          }}
+          title="Open in Github"
+        />
+      )}
     </View>
   );
 };
