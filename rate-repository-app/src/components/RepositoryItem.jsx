@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Image, StyleSheet, Button, Linking } from "react-native";
-import * as WebBrowser from "expo-web-browser";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Button,
+  Linking,
+  FlatList,
+} from "react-native";
+// import * as WebBrowser from "expo-web-browser";
 import { useLazyQuery } from "@apollo/client";
 import { useParams } from "react-router-native";
 
 import theme from "../theme";
 import Text from "./Text";
 import formatInThousands from "../utils/formatInThousands";
+import formatDate from "../utils/formatDate";
 import { GET_REPOSITORY } from "../graphql/queries";
 
 const styles = StyleSheet.create({
@@ -62,6 +70,23 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 6,
   },
+  separator: {
+    height: 10,
+  },
+  reviewRatingContainer: {
+    height: 48,
+    width: 48,
+    borderRadius: 24,
+    borderColor: theme.colors.primary,
+    borderStyle: "solid",
+    borderWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  reviewRatingText: {
+    color: "blue",
+    textAlign: "center",
+  },
 });
 
 const CountItem = ({ label, count, id }) => {
@@ -79,22 +104,7 @@ const CountItem = ({ label, count, id }) => {
   );
 };
 
-const RepositoryItem = ({ repository = {}, singleView = false }) => {
-  const [repoData, setRepoData] = useState(repository);
-  const [getRepoData, { data, loading }] = useLazyQuery(GET_REPOSITORY);
-  const { id: idFromParams } = useParams();
-
-  useEffect(() => {
-    if (!Object.keys(repository).length) {
-      getRepoData({ variables: { id: idFromParams } });
-    }
-    if (data && data.repository) {
-      setRepoData(data.repository);
-    }
-  }, [data]);
-
-  if (loading) return <Text>...Loading</Text>;
-
+const RepositoryInfo = ({ repoData, singleView }) => {
   const {
     id,
     fullName,
@@ -156,6 +166,78 @@ const RepositoryItem = ({ repository = {}, singleView = false }) => {
       )}
     </View>
   );
+};
+
+const ReviewItem = ({ review }) => {
+  const { id, text, rating, createdAt, user } = review;
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        <View style={styles.reviewRatingContainer}>
+          <Text style={styles.reviewRatingText}>{rating}</Text>
+        </View>
+        <View style={styles.contentContainer}>
+          <Text
+            style={styles.nameText}
+            fontWeight="bold"
+            fontSize="subheading"
+            numberOfLines={1}
+          >
+            {user.username}
+          </Text>
+          <Text
+            style={styles.descriptionText}
+            color="textSecondary"
+            testID={`${id}/description`}
+          >
+            {formatDate(createdAt)}
+          </Text>
+          <Text>{text}</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const ItemSeparator = () => <View style={styles.separator} />;
+
+const RepositoryItem = ({ repository = {}, singleView = false }) => {
+  const [repoData, setRepoData] = useState(repository);
+  const [getRepoData, { data, loading }] = useLazyQuery(GET_REPOSITORY);
+  const { id: idFromParams } = useParams();
+  //console.log(repoData);
+
+  useEffect(() => {
+    if (!Object.keys(repository).length) {
+      getRepoData({ variables: { id: idFromParams } });
+    }
+    if (data && data.repository) {
+      setRepoData(data.repository);
+    }
+  }, [data]);
+
+  if (loading) return <Text>...Loading</Text>;
+
+  let reviews = [];
+  if (repoData.reviews) {
+    reviews = repoData.reviews.edges.map((edge) => edge.node);
+  }
+
+  return singleView ? (
+    <FlatList
+      data={reviews}
+      renderItem={({ item }) => <ReviewItem review={item} />}
+      keyExtractor={({ id }) => id}
+      ListHeaderComponent={() => (
+        <RepositoryInfo repoData={repoData} singleView={singleView} />
+      )}
+      ItemSeparatorComponent={ItemSeparator}
+    />
+  ) : (
+    <RepositoryInfo repoData={repoData} singleView={singleView} />
+  );
+  // return <RepositoryInfo repoData={repoData} singleView={singleView} />;
 };
 
 export default RepositoryItem;
