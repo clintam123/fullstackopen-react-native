@@ -87,11 +87,6 @@ const styles = StyleSheet.create({
     color: "blue",
     textAlign: "center",
   },
-  buttonContainer: {
-    backgroundColor: theme.colors.primary,
-    justifyContent: "center",
-    margin: 8,
-  },
 });
 
 const CountItem = ({ label, count, id }) => {
@@ -161,17 +156,15 @@ const RepositoryInfo = ({ repoData, singleView }) => {
         <CountItem count={reviewCount} label="Reviews" id={id} />
         <CountItem count={ratingAverage} label="Rating" id={id} />
       </View>
-      <View style={styles.buttonContainer}>
-        {singleView && (
-          <Button
-            onPress={() => {
-              Linking.openURL(url);
-              console.log(press);
-            }}
-            title="Open in Github"
-          />
-        )}
-      </View>
+      {singleView && (
+        <Button
+          onPress={() => {
+            Linking.openURL(url);
+            console.log(press);
+          }}
+          title="Open in Github"
+        />
+      )}
     </View>
   );
 };
@@ -236,9 +229,9 @@ const RepositoryItem = ({ repository = {}, singleView = false }) => {
       data={reviews}
       renderItem={({ item }) => <ReviewItem review={item} />}
       keyExtractor={({ id }) => id}
-      ListHeaderComponent={() => (
+      ListHeaderComponent={
         <RepositoryInfo repoData={repoData} singleView={singleView} />
-      )}
+      }
       ItemSeparatorComponent={ItemSeparator}
     />
   ) : (
