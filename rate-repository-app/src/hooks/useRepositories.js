@@ -8,10 +8,10 @@ const sortCriteriaOptions = {
   lowest_rated_repos: { orderBy: "RATING_AVERAGE", orderDirection: "ASC" },
 };
 
-const useRepositories = (sortCriteria) => {
+const useRepositories = ({ sortCriteria, filter }) => {
   const { data, ...result } = useQuery(GET_REPOSITORIES, {
     fetchPolicy: "cache-and-network",
-    variables: sortCriteriaOptions[sortCriteria],
+    variables: { ...sortCriteriaOptions[sortCriteria], filter },
   });
 
   return { repositories: data ? data.repositories : undefined, ...result };

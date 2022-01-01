@@ -87,6 +87,11 @@ const styles = StyleSheet.create({
     color: "blue",
     textAlign: "center",
   },
+  buttonContainer: {
+    backgroundColor: theme.colors.primary,
+    justifyContent: "center",
+    margin: 8,
+  },
 });
 
 const CountItem = ({ label, count, id }) => {
@@ -156,14 +161,17 @@ const RepositoryInfo = ({ repoData, singleView }) => {
         <CountItem count={reviewCount} label="Reviews" id={id} />
         <CountItem count={ratingAverage} label="Rating" id={id} />
       </View>
-      {singleView && (
-        <Button
-          onPress={() => {
-            Linking.openURL(url);
-          }}
-          title="Open in Github"
-        />
-      )}
+      <View style={styles.buttonContainer}>
+        {singleView && (
+          <Button
+            onPress={() => {
+              Linking.openURL(url);
+              console.log(press);
+            }}
+            title="Open in Github"
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -218,8 +226,6 @@ const RepositoryItem = ({ repository = {}, singleView = false }) => {
     }
   }, [data]);
 
-  // if (loading) return <Text>...Loading</Text>;
-
   let reviews = [];
   if (repoData.reviews) {
     reviews = repoData.reviews.edges.map((edge) => edge.node);
@@ -238,6 +244,8 @@ const RepositoryItem = ({ repository = {}, singleView = false }) => {
   ) : (
     <RepositoryInfo repoData={repoData} singleView={singleView} />
   );
+
+  // return <RepositoryInfo repoData={repoData} singleView={singleView} />;
 };
 
 export default RepositoryItem;
