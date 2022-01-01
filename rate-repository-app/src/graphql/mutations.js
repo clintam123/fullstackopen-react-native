@@ -22,3 +22,13 @@ export const CREATE_REVIEW = gql`
     }
   }
 `;
+
+export const SIGN_UP = gql`
+  mutation createUser($user: CreateUserInput!) {
+    createUser(user: $user) {
+      ...userBaseFields
+    }
+  }
+
+  ${USER_BASE_FIELDS}
+`;
