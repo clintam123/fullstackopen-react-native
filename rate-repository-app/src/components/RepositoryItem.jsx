@@ -204,9 +204,10 @@ const ItemSeparator = () => <View style={styles.separator} />;
 
 const RepositoryItem = ({ repository = {}, singleView = false }) => {
   const [repoData, setRepoData] = useState(repository);
-  const [getRepoData, { data, loading }] = useLazyQuery(GET_REPOSITORY);
+  const [getRepoData, { data, loading }] = useLazyQuery(GET_REPOSITORY, {
+    fetchPolicy: "cache-and-network",
+  });
   const { id: idFromParams } = useParams();
-  //console.log(repoData);
 
   useEffect(() => {
     if (!Object.keys(repository).length) {
@@ -217,7 +218,7 @@ const RepositoryItem = ({ repository = {}, singleView = false }) => {
     }
   }, [data]);
 
-  if (loading) return <Text>...Loading</Text>;
+  // if (loading) return <Text>...Loading</Text>;
 
   let reviews = [];
   if (repoData.reviews) {
@@ -237,7 +238,6 @@ const RepositoryItem = ({ repository = {}, singleView = false }) => {
   ) : (
     <RepositoryInfo repoData={repoData} singleView={singleView} />
   );
-  // return <RepositoryInfo repoData={repoData} singleView={singleView} />;
 };
 
 export default RepositoryItem;

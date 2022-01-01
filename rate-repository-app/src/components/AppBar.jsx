@@ -68,7 +68,12 @@ const AppBar = () => {
           Repositories
         </Link>
         {authorizedUser ? (
-          <AppBarTab onPress={onSignOut}>Sign out</AppBarTab>
+          <>
+            <Link to="/review" component={AppBarTab}>
+              Create a review
+            </Link>
+            <AppBarTab onPress={onSignOut}>Sign out</AppBarTab>
+          </>
         ) : (
           <Link to="/sign-in" component={AppBarTab}>
             Sign in

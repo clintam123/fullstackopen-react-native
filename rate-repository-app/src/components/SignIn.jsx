@@ -34,7 +34,7 @@ const SignInForm = ({ onSubmit }) => {
       <View style={styles.fieldContainer}>
         <FormikTextInput name="username" placeholder="Username" />
       </View>
-      <View style={styles.fieldContainer}>
+    <View style={styles.fieldContainer}>
         <FormikTextInput
           name="password"
           placeholder="Password"
