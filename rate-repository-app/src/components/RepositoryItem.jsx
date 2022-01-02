@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Image,
@@ -7,13 +7,11 @@ import {
   Linking,
   FlatList,
 } from "react-native";
-import { useParams } from "react-router-native";
 
 import theme from "../theme";
 import Text from "./Text";
 import formatInThousands from "../utils/formatInThousands";
 import formatDate from "../utils/formatDate";
-import useRepository from "../hooks/useSingleRepository";
 
 const styles = StyleSheet.create({
   container: {
@@ -103,6 +101,10 @@ const CountItem = ({ label, count, id }) => {
 };
 
 const RepositoryInfo = ({ repository, singleView }) => {
+  if (!repository) {
+    return null;
+  }
+  
   const {
     id,
     fullName,
@@ -208,14 +210,16 @@ const RepositoryItem = ({
   loading,
   singleView = false,
 }) => {
+  const listHeaderComponent = repository ? (
+    <RepositoryInfo repository={repository} singleView={singleView} />
+  ) : null;
+
   return reviews.length ? (
     <FlatList
       data={reviews}
       renderItem={({ item }) => <ReviewItem review={item} />}
       keyExtractor={({ id }) => id}
-      ListHeaderComponent={
-        <RepositoryInfo repository={repository} singleView={singleView} />
-      }
+      ListHeaderComponent={listHeaderComponent}
       ItemSeparatorComponent={ItemSeparator}
       onEndReached={handleFetchMore}
       onEndReachedThreshold={0.5}

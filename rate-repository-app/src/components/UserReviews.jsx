@@ -1,0 +1,20 @@
+import React from "react";
+import { useQuery } from "@apollo/client";
+
+import RepositoryItem from "./RepositoryItem";
+import { GET_AUTHORIZED_USER } from "../graphql/queries";
+
+const UserReviews = () => {
+  const { data, loading } = useQuery(GET_AUTHORIZED_USER, {
+    variables: { includeReviews: true },
+  });
+
+  let userReviews;
+  if (data?.authorizedUser) {
+    userReviews = data.authorizedUser.reviews.edges.map(({ node }) => node);
+  }
+
+  return <RepositoryItem reviews={userReviews} loading={loading} />;
+};
+
+export default UserReviews;

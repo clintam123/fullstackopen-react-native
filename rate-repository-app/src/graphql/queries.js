@@ -33,20 +33,34 @@ export const GET_REPOSITORIES = gql`
         startCursor
         hasNextPage
       }
-    }
+    } 
   }
 
   ${REPOSITORY_BASE_FIELDS}
 `;
 
 export const GET_AUTHORIZED_USER = gql`
-  query {
+  query getAuthorizedUser($includeReviews: Boolean = false) {
     authorizedUser {
       ...userBaseFields
+      reviews @include(if: $includeReviews) {
+        edges {
+          node {
+            ...reviewBaseFields
+          }
+          cursor
+        }
+        pageInfo {
+          endCursor
+          startCursor
+          hasNextPage
+        }
+      }
     }
   }
 
   ${USER_BASE_FIELDS}
+  ${REVIEW_BASE_FIELDS}
 `;
 
 export const GET_REPOSITORY = gql`

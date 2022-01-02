@@ -3,12 +3,12 @@ import { StyleSheet, View } from "react-native";
 import { Route, Switch, Redirect } from "react-router-native";
 
 import RepositoryList from "./RepositoryList";
-import RepositoryItem from "./RepositoryItem";
 import AppBar from "./AppBar";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Review from "./Review";
 import SingleRepository from "./SingleRepository";
+import UserReviews from "./UserReviews";
 import theme from "../theme";
 
 const styles = StyleSheet.create({
@@ -35,6 +35,9 @@ const Main = () => {
         </Route>
         <Route path="/review" exact>
           <Review />
+        </Route>
+        <Route path="/my-reviews" exact>
+          <UserReviews />
         </Route>
         <Route path="/:id" exact>
           <SingleRepository />
