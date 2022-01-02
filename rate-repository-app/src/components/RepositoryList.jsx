@@ -30,7 +30,7 @@ export class RepositoryListContainer extends React.Component {
   };
 
   render() {
-    const { repositories, history } = this.props;
+    const { repositories, history, onEndReach } = this.props;
 
     const repositoryNodes = repositories
       ? repositories.edges.map((edge) => edge.node)
@@ -47,6 +47,8 @@ export class RepositoryListContainer extends React.Component {
           </Pressable>
         )}
         ItemSeparatorComponent={ItemSeparator}
+        onEndReached={onEndReach}
+        onEndReachedThreshold={0.5}
       />
     );
   }
@@ -55,7 +57,15 @@ export class RepositoryListContainer extends React.Component {
 const RepositoryList = () => {
   const [sorting, setSorting] = useState("latest_repos");
   const [filter, setFilter] = useState("");
-  const { repositories } = useRepositories({ sortCriteria: sorting, filter });
+  const { repositories, fetchMore } = useRepositories({
+    sortCriteria: sorting,
+    filter,
+    first: 8,
+  });
+
+  const onEndReach = () => {
+    fetchMore();
+  };
 
   const RepositoryListContainerWithRouter = withRouter(RepositoryListContainer);
 
@@ -66,6 +76,7 @@ const RepositoryList = () => {
       sorting={sorting}
       setFilter={setFilter}
       filter={filter}
+      onEndReach={onEndReach}
     />
   );
 };

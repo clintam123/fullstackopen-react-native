@@ -8,13 +8,33 @@ const sortCriteriaOptions = {
   lowest_rated_repos: { orderBy: "RATING_AVERAGE", orderDirection: "ASC" },
 };
 
-const useRepositories = ({ sortCriteria, filter }) => {
-  const { data, ...result } = useQuery(GET_REPOSITORIES, {
+const useRepositories = ({ sortCriteria, filter, first }) => {
+  const variables = { ...sortCriteriaOptions[sortCriteria], filter, first };
+  const { data, loading, fetchMore, ...result } = useQuery(GET_REPOSITORIES, {
     fetchPolicy: "cache-and-network",
-    variables: { ...sortCriteriaOptions[sortCriteria], filter },
+    variables: variables,
   });
 
-  return { repositories: data ? data.repositories : undefined, ...result };
+  const handleFetchMore = () => {
+    const canFetchMore = !loading && data?.repositories.pageInfo.hasNextPage;
+
+    if (!canFetchMore) {
+      return;
+    }
+
+    fetchMore({
+      variables: {
+        after: data.repositories.pageInfo.endCursor,
+        ...variables,
+      },
+    });
+  };
+
+  return {
+    repositories: data ? data.repositories : undefined,
+    fetchMore: handleFetchMore,
+    ...result,
+  };
 };
 
 export default useRepositories;
