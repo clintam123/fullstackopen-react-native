@@ -3,10 +3,14 @@ import {
   View,
   Image,
   StyleSheet,
-  Button,
   Linking,
   FlatList,
+  Alert,
 } from "react-native";
+import Button from "./Button";
+import { useMutation } from "@apollo/client";
+import { useHistory } from "react-router-native";
+import { DELETE_REVIEW } from "../graphql/mutations";
 
 import theme from "../theme";
 import Text from "./Text";
@@ -82,6 +86,11 @@ const styles = StyleSheet.create({
   reviewRatingText: {
     color: "blue",
     textAlign: "center",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 10,
   },
 });
 
@@ -160,17 +169,58 @@ const RepositoryInfo = ({ repository, singleView }) => {
         <Button
           onPress={() => {
             Linking.openURL(url);
-            console.log(press);
           }}
-          title="Open in Github"
-        />
+        >
+          Open in Github
+        </Button>
       )}
     </View>
   );
 };
 
-const ReviewItem = ({ review, reviewsOnly = false }) => {
-  const { id, text, rating, createdAt, user, repository } = review;
+const ReviewItem = ({ review, reviewsOnly = false, refetch }) => {
+  const { id, text, rating, createdAt, user, repository, repositoryId } =
+    review;
+
+  const [deleteReview] = useMutation(DELETE_REVIEW);
+  const history = useHistory();
+
+  const handleViewRepository = () => {
+    history.push(`/${repositoryId}`);
+  };
+
+  const handleDeleteReview = () => {
+    Alert.alert(
+      "Delete review",
+      "Are you sure you want to delete this review?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "DELETE",
+          onPress: async () => {
+            if (refetch) {
+              await deleteReview({ variables: { id: review.id } });
+              await refetch({ includeReviews: true });
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const AllButtons = (
+    <View style={styles.buttonContainer}>
+      <Button
+        style={{ backgroundColor: "blue" }}
+        onPress={handleViewRepository}
+      >
+        View Repository
+      </Button>
+      <Button style={{ backgroundColor: "red" }} onPress={handleDeleteReview}>
+        Delete Review
+      </Button>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -195,6 +245,7 @@ const ReviewItem = ({ review, reviewsOnly = false }) => {
             {formatDate(createdAt)}
           </Text>
           <Text>{text}</Text>
+          {reviewsOnly && AllButtons}
         </View>
       </View>
     </View>
@@ -209,6 +260,7 @@ const RepositoryItem = ({
   handleFetchMore,
   loading,
   singleView = false,
+  refetch,
 }) => {
   const listHeaderComponent = repository ? (
     <RepositoryInfo repository={repository} singleView={singleView} />
@@ -218,7 +270,7 @@ const RepositoryItem = ({
     <FlatList
       data={reviews}
       renderItem={({ item }) => (
-        <ReviewItem review={item} reviewsOnly={!repository} />
+        <ReviewItem review={item} reviewsOnly={!repository} refetch={refetch} />
       )}
       keyExtractor={({ id }) => id}
       ListHeaderComponent={listHeaderComponent}
