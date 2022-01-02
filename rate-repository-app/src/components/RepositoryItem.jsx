@@ -7,15 +7,13 @@ import {
   Linking,
   FlatList,
 } from "react-native";
-// import * as WebBrowser from "expo-web-browser";
-import { useLazyQuery } from "@apollo/client";
 import { useParams } from "react-router-native";
 
 import theme from "../theme";
 import Text from "./Text";
 import formatInThousands from "../utils/formatInThousands";
 import formatDate from "../utils/formatDate";
-import { GET_REPOSITORY } from "../graphql/queries";
+import useRepository from "../hooks/useSingleRepository";
 
 const styles = StyleSheet.create({
   container: {
@@ -104,7 +102,7 @@ const CountItem = ({ label, count, id }) => {
   );
 };
 
-const RepositoryInfo = ({ repoData, singleView }) => {
+const RepositoryInfo = ({ repository, singleView }) => {
   const {
     id,
     fullName,
@@ -116,7 +114,7 @@ const RepositoryInfo = ({ repoData, singleView }) => {
     reviewCount,
     ownerAvatarUrl,
     url,
-  } = repoData;
+  } = repository;
 
   return (
     <View style={styles.container}>
@@ -203,42 +201,28 @@ const ReviewItem = ({ review }) => {
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
-const RepositoryItem = ({ repository = {}, singleView = false }) => {
-  const [repoData, setRepoData] = useState(repository);
-  const [getRepoData, { data, loading }] = useLazyQuery(GET_REPOSITORY, {
-    fetchPolicy: "cache-and-network",
-  });
-  const { id: idFromParams } = useParams();
-
-  useEffect(() => {
-    if (!Object.keys(repository).length) {
-      getRepoData({ variables: { id: idFromParams } });
-    }
-    if (data && data.repository) {
-      setRepoData(data.repository);
-    }
-  }, [data]);
-
-  let reviews = [];
-  if (repoData.reviews) {
-    reviews = repoData.reviews.edges.map((edge) => edge.node);
-  }
-
-  return singleView ? (
+const RepositoryItem = ({
+  repository,
+  reviews = [],
+  handleFetchMore,
+  loading,
+  singleView = false,
+}) => {
+  return reviews.length ? (
     <FlatList
       data={reviews}
       renderItem={({ item }) => <ReviewItem review={item} />}
       keyExtractor={({ id }) => id}
       ListHeaderComponent={
-        <RepositoryInfo repoData={repoData} singleView={singleView} />
+        <RepositoryInfo repository={repository} singleView={singleView} />
       }
       ItemSeparatorComponent={ItemSeparator}
+      onEndReached={handleFetchMore}
+      onEndReachedThreshold={0.5}
     />
   ) : (
-    <RepositoryInfo repoData={repoData} singleView={singleView} />
+    <RepositoryInfo repository={repository} singleView={singleView} />
   );
-
-  // return <RepositoryInfo repoData={repoData} singleView={singleView} />;
 };
 
 export default RepositoryItem;

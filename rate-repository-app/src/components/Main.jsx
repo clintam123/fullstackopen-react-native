@@ -8,6 +8,7 @@ import AppBar from "./AppBar";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Review from "./Review";
+import SingleRepository from "./SingleRepository";
 import theme from "../theme";
 
 const styles = StyleSheet.create({
@@ -36,7 +37,7 @@ const Main = () => {
           <Review />
         </Route>
         <Route path="/:id" exact>
-          <RepositoryItem singleView />
+          <SingleRepository />
         </Route>
         <Redirect to="/" />
       </Switch>
