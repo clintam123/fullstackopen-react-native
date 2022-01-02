@@ -104,7 +104,7 @@ const RepositoryInfo = ({ repository, singleView }) => {
   if (!repository) {
     return null;
   }
-  
+
   const {
     id,
     fullName,
@@ -169,8 +169,8 @@ const RepositoryInfo = ({ repository, singleView }) => {
   );
 };
 
-const ReviewItem = ({ review }) => {
-  const { id, text, rating, createdAt, user } = review;
+const ReviewItem = ({ review, reviewsOnly = false }) => {
+  const { id, text, rating, createdAt, user, repository } = review;
 
   return (
     <View style={styles.container}>
@@ -185,7 +185,7 @@ const ReviewItem = ({ review }) => {
             fontSize="subheading"
             numberOfLines={1}
           >
-            {user.username}
+            {reviewsOnly ? repository.fullName : user.username}
           </Text>
           <Text
             style={styles.descriptionText}
@@ -217,7 +217,9 @@ const RepositoryItem = ({
   return reviews.length ? (
     <FlatList
       data={reviews}
-      renderItem={({ item }) => <ReviewItem review={item} />}
+      renderItem={({ item }) => (
+        <ReviewItem review={item} reviewsOnly={!repository} />
+      )}
       keyExtractor={({ id }) => id}
       ListHeaderComponent={listHeaderComponent}
       ItemSeparatorComponent={ItemSeparator}
